@@ -1,0 +1,12 @@
+homestay\console\domian\PageBean.class
+homestay\console\domian\CityBaseListVO.class
+homestay\console\domian\BaseListVO.class
+homestay\console\controller\HomestayController.class
+homestay\console\domian\SurroundingsVO.class
+homestay\console\domian\HomestayListVO.class
+homestay\console\domian\WPVO.class
+homestay\console\ConsoleApplication.class
+homestay\console\domian\CityListVO.class
+homestay\console\domian\CityVO.class
+homestay\console\controller\CityController.class
+homestay\console\domian\HomestayVO.class

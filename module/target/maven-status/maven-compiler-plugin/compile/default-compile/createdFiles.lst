@@ -1,0 +1,6 @@
+homestay\module\service\CityService.class
+homestay\module\entity\City.class
+homestay\module\entity\Homestay.class
+homestay\module\mapper\CityMapper.class
+homestay\module\service\HomestayService.class
+homestay\module\mapper\HomestayMapper.class
