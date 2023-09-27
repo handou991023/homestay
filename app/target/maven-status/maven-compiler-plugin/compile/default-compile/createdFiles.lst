@@ -1,8 +1,9 @@
-homestay\app\domian\HomestayListVO.class
-homestay\app\domian\BaseListVO.class
-homestay\app\domian\HomestayVO.class
-homestay\app\AppApplication.class
 homestay\app\domian\PageBean.class
 homestay\app\controller\HomestayController.class
+homestay\app\domian\HomestayListVO.class
+homestay\app\domian\BaseListVO.class
 homestay\app\domian\SurroundingsVO.class
 homestay\app\domian\WPVO.class
+homestay\app\domian\HomestayVO.class
+homestay\app\annotations\VerifiedUser.class
+homestay\app\AppApplication.class

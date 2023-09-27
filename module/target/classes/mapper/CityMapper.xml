@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="homestay.module.mapper.CityMapper" >
-    <select id="getPagingQuery" resultType="homestay.module.entity.City">
+<mapper namespace="homestay.module.city.mapper.CityMapper" >
+    <select id="getPagingQuery" resultType="homestay.module.city.entity.City">
         select * from city where is_deleted = 0
         <if test="name != null and name != ''">
             and name like concat('%',#{name},'%')
@@ -17,14 +17,14 @@
 
     </select>
 
-    <select id="getIdColumn" resultType="homestay.module.entity.City">
+    <select id="getIdColumn" resultType="homestay.module.city.entity.City">
         SELECT * FROM city where is_deleted = 0
         <if test="title != null and title != ''">
             and name like concat('%',#{title},'%')
         </if>
 
     </select>
-    <select id="getCityList" resultType="homestay.module.entity.City">
+    <select id="getCityList" resultType="homestay.module.city.entity.City">
         select * from city where is_deleted = 0
             <if test="cityIds != null and cityIds != ''">
                 and id in (${cityIds})
@@ -33,7 +33,7 @@
 
 
     <insert id="insert"
-            parameterType="homestay.module.entity.City"
+            parameterType="homestay.module.city.entity.City"
             useGeneratedKeys="true"
             keyColumn="id"
             keyProperty="id">
@@ -53,7 +53,7 @@
     </insert>
 
     <update id="update"
-            parameterType="homestay.module.entity.City">
+            parameterType="homestay.module.city.entity.City">
         update city set id = #{city.id}
         <if test="city.image != null and city.image != ''">,image = #{city.image}</if>
         <if test="city.name != null and city.name != ''">,name = #{city.name}</if>

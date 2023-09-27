@@ -2,10 +2,13 @@ package homestay.app.controller;
 
 import com.alibaba.fastjson.JSON;
 import homestay.app.domian.*;
-import homestay.module.entity.City;
-import homestay.module.entity.Homestay;
-import homestay.module.service.CityService;
-import homestay.module.service.HomestayService;
+import homestay.module.utils.BaseUtils;
+import homestay.module.utils.Response;
+import homestay.module.utils.UploadUtil;
+import homestay.module.city.entity.City;
+import homestay.module.homestay.entity.Homestay;
+import homestay.module.city.service.CityService;
+import homestay.module.homestay.service.HomestayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.util.ObjectUtils;
@@ -27,12 +30,12 @@ public class HomestayController {
     private HomestayService homestayService;
     @Autowired
     private CityService cityService;
-    private final int pageSize = 5;//每页数据量
+
     @RequestMapping("/homestay/info")
-    public HomestayVO homestayInfo(@RequestParam(name = "homestayId")BigInteger id){
+    public Response<HomestayVO> homestayInfo(@RequestParam(name = "homestayId")BigInteger id){
         Homestay homestay = homestayService.getHomestayInfoById(id);
-        if (homestay == null){
-            return null;
+        if (BaseUtils.isEmpty(homestay)){
+            return new Response<>(4004);
         }
         HomestayVO entry = new HomestayVO();
         Integer createTime = homestay.getCreateTime();
@@ -60,10 +63,10 @@ public class HomestayController {
         entry.setPhone(homestay.getPhone());
         List<SurroundingsVO> surroundingList = JSON.parseArray(homestay.getSurroundings(), SurroundingsVO.class);
         entry.setSurroundings(surroundingList);
-        return entry;
+        return new Response<>(1001,entry);
     }
     @RequestMapping("/homestay/all")
-    public List<HomestayListVO> homestayAll() {
+    public Response<List<HomestayListVO>> homestayAll() {
         List<Homestay> homestayList = homestayService.getAllHomestayAllInfo();
         List<HomestayListVO> list = new ArrayList<>();
         for (Homestay homestay:homestayList) {
@@ -79,10 +82,11 @@ public class HomestayController {
             entry.setLongitude(homestay.getLongitude());
             list.add(entry);
         }
-        return list;
+        return new Response<>(1001,list);
     }
     @RequestMapping("/homestay/list")
-    public BaseListVO homestayList(@RequestParam(name = "title", required = false)String title, @RequestParam(name = "wp" , required = false) String wp) {
+    public Response<BaseListVO> homestayList(@RequestParam(name = "title", required = false)String title,
+                                   @RequestParam(name = "wp" , required = false) String wp) {
         int page;
         if (ObjectUtils.isEmpty(wp)) {
             page = 1;
@@ -97,6 +101,8 @@ public class HomestayController {
                 title = wpvo.getTitle();
             }
         }
+        //每页数据量
+        int pageSize = 5;
         List<Homestay> homestayList = homestayService.getPagingQuery(title, page, pageSize);
         Map<BigInteger,City> cityMap = new HashMap<>();
         List<BigInteger> cityIdList = new ArrayList<>();
@@ -133,7 +139,7 @@ public class HomestayController {
         byte[] encodeWp = Base64.getUrlEncoder().encode(jsonString.getBytes(StandardCharsets.UTF_8));
         baseListVO.setList(list);
         baseListVO.setWp(new String(encodeWp,StandardCharsets.UTF_8).trim());
-        return baseListVO;
+        return new Response<>(1001,baseListVO);
     }
 
     @PostMapping("/upload")
@@ -158,6 +164,22 @@ public class HomestayController {
         } catch (IOException e) {
             e.printStackTrace();
             return  "图片上传失败";
+        }
+    }
+    @RequestMapping("upImg")
+    public String upImg(@RequestParam(value = "file")MultipartFile file)  {
+        try{
+            return UploadUtil.uploadImage(file);
+        }catch (IOException e){
+            return "图片上传失败";
+        }
+    }
+    @RequestMapping("upIm")
+    public String upIm(@RequestParam(value = "file")MultipartFile file)  {
+        try{
+            return UploadUtil.uploadImg(file);
+        }catch (IOException e){
+            return "图片上传失败";
         }
     }
 }
