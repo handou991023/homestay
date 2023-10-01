@@ -11,3 +11,5 @@ D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\homestay\BaseL
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\annotations\VerifiedUser.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\ConsoleApplication.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\controller\city\CityController.java
+D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\user\UserInfoVO.java
+D:\JavaSSE\homestay\console\src\main\java\homestay\console\controller\user\UserController.java

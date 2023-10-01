@@ -70,7 +70,7 @@ public class BaseUtils {
             format = "yyyy-MM-dd HH:mm:ss";
         }
         SimpleDateFormat sdf = new SimpleDateFormat(format);
-        return sdf.format(new Date(Long.valueOf(seconds + "000")));
+        return sdf.format(new Date(Long.parseLong(seconds + "000")));
     }
 
     public static String timeStamp2DateGMT(int seconds, String format) {
@@ -81,7 +81,7 @@ public class BaseUtils {
             format = "yyyy-MM-dd HH:mm:ss";
         }
         SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
-        return sdf.format(new Date(Long.valueOf(seconds + "000")));
+        return sdf.format(new Date(Long.parseLong(seconds + "000")));
     }
 
     /**
@@ -103,7 +103,7 @@ public class BaseUtils {
             String timestamp = String.valueOf(sdf.parse(date_str).getTime() / 1000);
             int length = timestamp.length();
             if (length > 3) {
-                return Integer.valueOf(timestamp.substring(0, length));
+                return Integer.parseInt(timestamp.substring(0, length));
             }
             return 0;
         } catch (Exception e) {
@@ -120,7 +120,7 @@ public class BaseUtils {
      */
     public static String getRandNumber(int num) {
         Random random = new Random();
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < num; i++) {
             result.append(random.nextInt(9)+1);
         }
@@ -184,13 +184,13 @@ public class BaseUtils {
 
     public static double getFileSize(Long len, String unit) {
         double fileSize = 0;
-        if ("B".equals(unit.toUpperCase())) {
+        if ("B".equalsIgnoreCase(unit)) {
             fileSize = (double) len;
-        } else if ("K".equals(unit.toUpperCase())) {
+        } else if ("K".equalsIgnoreCase(unit)) {
             fileSize = (double) len / 1024;
-        } else if ("M".equals(unit.toUpperCase())) {
+        } else if ("M".equalsIgnoreCase(unit)) {
             fileSize = (double) len / 1048576;
-        } else if ("G".equals(unit.toUpperCase())) {
+        } else if ("G".equalsIgnoreCase(unit)) {
             fileSize = (double) len / 1073741824;
         }
         return fileSize;

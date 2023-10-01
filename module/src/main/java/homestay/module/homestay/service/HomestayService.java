@@ -33,7 +33,7 @@ public class HomestayService {
         String cityIds = null;
         if (cityList.size() > 0){
             for (City city : cityList) {
-                ids.append( city.getId()  + ",");
+                ids.append(city.getId()).append(",");
             }
             ids.deleteCharAt(ids.length()-1);
             cityIds = ids.toString();

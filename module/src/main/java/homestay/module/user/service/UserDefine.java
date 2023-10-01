@@ -1,0 +1,47 @@
+package homestay.module.user.service;
+
+public enum UserDefine {
+    GENDER_UNKNOWN(0, "未知"),
+    GENDER_MALE(1, "男"),
+    GENDER_FEMALE(2, "女");
+
+    private final int code;
+    private final String name;
+
+    private UserDefine(int code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public static String convertGender(int code) {
+        String name = null;
+        switch (code) {
+            case 1:
+                name = GENDER_MALE.name;
+                break;
+            case 2:
+            default:
+                name = GENDER_FEMALE.name;
+                break;
+        }
+        return name;
+    }
+
+    public static boolean isGender(int code) {
+        if (GENDER_UNKNOWN.getCode() != code) {
+            return false;
+        }
+        if (GENDER_MALE.getCode() != code) {
+            return false;
+        }
+        return GENDER_FEMALE.getCode() == code;
+    }
+}
