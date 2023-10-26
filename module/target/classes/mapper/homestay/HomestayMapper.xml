@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="homestay.module.homestay.mapper.HomestayMapper" >
+
+    <select id="getAll" resultType="homestay.module.homestay.entity.Homestay">
+        select *
+        from homestay h,city c
+        where h.city_id = c.id and h.is_deleted = 0
+
+    </select>
+
+    <select id="getPagingQuery" resultType="homestay.module.homestay.entity.Homestay">
+        select *
+        from homestay
+        where is_deleted = 0 and (
+            title like concat('%',#{title},'%')
+        <if test="cityIds !=null and cityIds != '' ">
+            or city_id in (${cityIds})
+        </if>
+        )
+        order by id asc
+        limit #{offset},#{pageSize}
+    </select>
+
+    <select id="getPagingQueryTotal" resultType="Integer">
+        select count(*)
+        from homestay
+        where is_deleted = 0 and (
+            title like concat('%',#{title},'%')
+        <if test="cityIds !=null and cityIds != '' ">
+            or city_id in (${cityIds})
+        </if>
+        )
+    </select>
+    
+    <insert id="insert"
+            parameterType="homestay.module.homestay.entity.Homestay"
+            useGeneratedKeys="true"
+            keyColumn="id"
+            keyProperty="id">
+        insert into homestay(
+        <if test="homestay.userId != null and homestay.userId != ''">user_id,</if>
+        <if test="homestay.cityId != null and homestay.cityId != ''">city_id,</if>
+        <if test="homestay.images != null and homestay.images != ''">images,</if>
+        <if test="homestay.title != null and homestay.title != ''">title,</if>
+        <if test="homestay.location != null and homestay.location != ''">location,</if>
+        <if test="homestay.latitude != null and homestay.latitude != ''">latitude,</if>
+        <if test="homestay.longitude != null and homestay.longitude != ''">longitude,</if>
+        <if test="homestay.phone != null and homestay.phone != ''">phone,</if>
+        <if test="homestay.surroundings != null and homestay.surroundings != ''">surroundings,</if>
+        <if test="homestay.createTime != null">create_time,</if>
+        <if test="homestay.updateTime != null">update_time,</if>
+        is_deleted
+        )
+        values (
+        <if test="homestay.userId != null and homestay.userId != ''">#{homestay.userId},</if>
+        <if test="homestay.cityId != null and homestay.cityId != ''">#{homestay.cityId},</if>
+        <if test="homestay.images != null and homestay.images != ''">#{homestay.images},</if>
+        <if test="homestay.title != null and homestay.title != ''"> #{homestay.title},</if>
+        <if test="homestay.location != null and homestay.location != ''">#{homestay.location},</if>
+        <if test="homestay.latitude != null and homestay.latitude != ''">#{homestay.latitude},</if>
+        <if test="homestay.longitude != null and homestay.longitude != ''">#{homestay.longitude},</if>
+        <if test="homestay.phone != null and homestay.phone != ''">#{homestay.phone},</if>
+        <if test="homestay.surroundings != null and homestay.surroundings != ''">#{homestay.surroundings},</if>
+        <if test="homestay.createTime != null">#{homestay.createTime},</if>
+        <if test="homestay.updateTime != null">#{homestay.updateTime},</if>
+       #{homestay.isDeleted})
+    </insert>
+
+    <update id="update"
+            parameterType="homestay.module.homestay.entity.Homestay">
+        update homestay set id = #{homestay.id}
+                <if test="homestay.userId != null"> , user_id = #{homestay.userId}</if>
+                <if test="homestay.title != null and homestay.title != ''">,id = #{homestay.id}</if>
+                <if test="homestay.images != null and homestay.images != ''">,images = #{homestay.images}</if>
+                <if test="homestay.title != null and homestay.title != ''">,title = #{homestay.title}</if>
+                <if test="homestay.location != null and homestay.location != ''">,location = #{homestay.location}</if>
+                <if test="homestay.latitude != null and homestay.latitude != ''">,latitude = #{homestay.latitude}</if>
+                <if test="homestay.longitude != null and homestay.longitude != ''">,longitude = #{homestay.longitude}</if>
+                <if test="homestay.phone != null and homestay.phone != ''">,phone = #{homestay.phone}</if>
+                <if test="homestay.surroundings != null and homestay.surroundings != ''">,surroundings = #{homestay.surroundings}</if>
+                <if test="homestay.createTime != null">,create_time = #{homestay.createTime}</if>
+                <if test="homestay.updateTime != null">,update_time = #{homestay.updateTime}</if>
+                <if test="homestay.isDeleted != null">,is_deleted = #{homestay.isDeleted}</if>
+        where id = #{homestay.id}
+    </update>
+</mapper>
