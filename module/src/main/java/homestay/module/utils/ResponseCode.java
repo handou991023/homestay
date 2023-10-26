@@ -12,6 +12,7 @@ public class ResponseCode {
 
         //create user and forget password
         statusMap.put(2014,"账号未注册");
+        statusMap.put(2015,"此账号已存在，请重新登录");
 
         //console error
         //homestayId error

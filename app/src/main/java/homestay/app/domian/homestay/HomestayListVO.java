@@ -1,5 +1,6 @@
 package homestay.app.domian.homestay;
 
+import homestay.app.domian.upload.ImageVO;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -12,7 +13,7 @@ public class HomestayListVO {
     private BigInteger homestayId;
 
     private String cityName;
-    private String image;
+    private ImageVO image;
     private String title;
     private BigDecimal longitude;
     private BigDecimal latitude;

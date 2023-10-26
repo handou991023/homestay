@@ -36,11 +36,11 @@ public enum UserDefine {
     }
 
     public static boolean isGender(int code) {
-        if (GENDER_UNKNOWN.getCode() != code) {
-            return false;
+        if (GENDER_UNKNOWN.getCode() == code  ) {
+            return true;
         }
-        if (GENDER_MALE.getCode() != code) {
-            return false;
+        if (GENDER_MALE.getCode() == code) {
+            return true;
         }
         return GENDER_FEMALE.getCode() == code;
     }

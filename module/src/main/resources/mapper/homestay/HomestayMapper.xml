@@ -39,6 +39,7 @@
             keyColumn="id"
             keyProperty="id">
         insert into homestay(
+        <if test="homestay.userId != null and homestay.userId != ''">user_id,</if>
         <if test="homestay.cityId != null and homestay.cityId != ''">city_id,</if>
         <if test="homestay.images != null and homestay.images != ''">images,</if>
         <if test="homestay.title != null and homestay.title != ''">title,</if>
@@ -52,6 +53,7 @@
         is_deleted
         )
         values (
+        <if test="homestay.userId != null and homestay.userId != ''">#{homestay.userId},</if>
         <if test="homestay.cityId != null and homestay.cityId != ''">#{homestay.cityId},</if>
         <if test="homestay.images != null and homestay.images != ''">#{homestay.images},</if>
         <if test="homestay.title != null and homestay.title != ''"> #{homestay.title},</if>
@@ -68,6 +70,7 @@
     <update id="update"
             parameterType="homestay.module.homestay.entity.Homestay">
         update homestay set id = #{homestay.id}
+                <if test="homestay.userId != null"> , user_id = #{homestay.userId}</if>
                 <if test="homestay.title != null and homestay.title != ''">,id = #{homestay.id}</if>
                 <if test="homestay.images != null and homestay.images != ''">,images = #{homestay.images}</if>
                 <if test="homestay.title != null and homestay.title != ''">,title = #{homestay.title}</if>

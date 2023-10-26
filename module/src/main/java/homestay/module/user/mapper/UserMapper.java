@@ -1,11 +1,7 @@
 package homestay.module.user.mapper;
 
 import homestay.module.user.entity.User;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-
+import org.apache.ibatis.annotations.*;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -22,18 +18,11 @@ public interface UserMapper {
 
     @Select("select * from user WHERE phone=#{phone} and country_code=#{countryCode} and is_ban = 0 and is_deleted = 0")
     User getByPhone(@Param("phone") String phone, @Param("countryCode") String countryCode);
-
+    @Select("select * from user WHERE phone=#{phone} and country_code=#{countryCode} and password=#{password} and is_ban = 0 and is_deleted = 0")
+    User getLogin(@Param("phone") String phone, @Param("countryCode") String countryCode,@Param("password")String password);
     @Select("select * from user WHERE phone=#{phone} and country_code=#{countryCode}")
     User extractByPhone(@Param("phone") String phone, @Param("countryCode") String countryCode);
 
-    @Select("select * from user WHERE email=#{email}")
-    User extractByEmail(@Param("email") String email);
-
-    @Select("select * from user WHERE username=#{username} and is_ban = 0 and is_deleted = 0")
-    User getByUsername(@Param("username") String username);
-
-    @Select("select * from user WHERE wechat_open_id=#{wechatOpenId}")
-    User extractUserByWxOpenId(@Param("wechatOpenId") String wechatOpenId);
 
     int update(@Param("user") User user);
 
@@ -42,12 +31,5 @@ public interface UserMapper {
     @Update("update user set is_deleted=1, update_time=#{time} where id=#{id} limit 1")
     int delete(@Param("id") BigInteger id, @Param("time") Integer time);
 
-
-    @Select("select * from user where username like concat('%',#{username},'%') and is_ban = 0 and is_deleted = 0")
-    List<User> getUsersByUsername(@Param("username") String username);
-
-    List<User> getUsersForConsole(@Param("begin") int begin, @Param("size") int size, @Param("orderBy") String orderBy,
-                                  @Param("username") String username, @Param("phone") String phone);
-
-    int getUsersTotalForConsole(@Param("username") String username, @Param("phone") String phone);
+    User getUserLogin(@Param("phone") String phone,@Param("password") String password);
 }

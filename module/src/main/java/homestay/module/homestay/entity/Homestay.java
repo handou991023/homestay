@@ -13,6 +13,7 @@ import java.math.BigInteger;
 public class Homestay {
 
     private BigInteger id;
+    private BigInteger userId;
     /**
      * 民宿图片
      */

@@ -1,14 +1,23 @@
 package homestay.console.controller.homestay;
 
 import com.alibaba.fastjson.JSON;
+import homestay.console.annotations.VerifiedUser;
 import homestay.console.domian.homestay.*;
 import homestay.module.city.entity.City;
 import homestay.module.homestay.entity.Homestay;
 import homestay.module.city.service.CityService;
 import homestay.module.homestay.service.HomestayService;
+import homestay.module.user.entity.User;
+import homestay.module.user.service.UserService;
+import homestay.module.utils.BaseUtils;
+import homestay.module.utils.Response;
+import homestay.module.utils.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -21,53 +30,114 @@ public class HomestayController {
     private HomestayService homestayService;
     @Autowired
     private CityService cityService;
-    private final int pageSize = 5;//每页数据量
+    @Autowired
+    private UserService userService;
+
     @RequestMapping("/homestay/create")
-    public String homestayCreate(@RequestParam(name = "homestayId",required = false)BigInteger homestayId,
-                               @RequestParam(name = "cityId")BigInteger cityId,
-                               @RequestParam(name = "images")String images,
-                               @RequestParam(name = "title")String title,
-                               @RequestParam(name = "location")String location,
-                               @RequestParam(name = "longitude")BigDecimal longitude,
-                               @RequestParam(name = "latitude") BigDecimal latitude,
-                               @RequestParam(name = "phone")String phone,
-                               @RequestParam(name = "surroundings",required = false)String surroundings) {
+    public Response<HomestayVO> homestayCreate(@VerifiedUser User loginUser,
+                                               @RequestParam(name = "userId") BigInteger relateUserId,
+                                               @RequestParam(name = "cityId")BigInteger cityId,
+                                               @RequestParam(name = "images")String images,
+                                               @RequestParam(name = "title")String title,
+                                               @RequestParam(name = "location")String location,
+                                               @RequestParam(name = "longitude")BigDecimal longitude,
+                                               @RequestParam(name = "latitude") BigDecimal latitude,
+                                               @RequestParam(name = "phone")String phone,
+                                               @RequestParam(name = "surroundings",required = false)String surroundings) {
+        if (BaseUtils.isEmpty(loginUser)) {
+            return new Response<>(1002);
+        }
+        title = title.trim();
+        if (BaseUtils.isEmpty(title)) {
+            return new Response<>(3051);
+        }
+        if (!BaseUtils.isEmpty(relateUserId)){
+            User user = userService.getById(relateUserId);
+            if (BaseUtils.isEmpty(user)){
+                return new Response<>(3052);
+            }
+        }
 
         try {
-                BigInteger result = homestayService.editHomestay(homestayId, cityId, images, title.trim(), location.trim(), longitude, latitude, phone.trim(), surroundings);
-                return result + "成功 ";
+                BigInteger newHomestayId = homestayService.editHomestay(null, relateUserId, cityId, images, title.trim(), location.trim(), longitude, latitude, phone.trim(), surroundings);
+                Homestay homestay = homestayService.getHomestayInfoById(newHomestayId);
+                HomestayVO homestayVO = new HomestayVO();
+                homestayVO.setHomestayId(newHomestayId);
+                homestayVO.setImages(Collections.singletonList(homestay.getImages()));
+                homestayVO.setTitle(homestay.getTitle());
 
+            return new Response<>(1001,homestayVO);
         }catch(RuntimeException e){
-                return e.getLocalizedMessage();
+            return new Response<>(4004);
             }
     }
     @RequestMapping("/homestay/update")
-    public String homestayUpdate(@RequestParam(name = "homestayId",required = false)BigInteger homestayId,
-                                 @RequestParam(name = "cityId")BigInteger cityId,
-                                 @RequestParam(name = "images")String images,
-                                 @RequestParam(name = "title")String title,
-                                 @RequestParam(name = "location")String location,
-                                 @RequestParam(name = "longitude")BigDecimal longitude,
-                                 @RequestParam(name = "latitude") BigDecimal latitude,
-                                 @RequestParam(name = "phone")String phone,
-                                 @RequestParam(name = "surroundings",required = false)String surroundings) {
+    public Response<HomestayVO> homestayUpdate(@VerifiedUser User loginUser,
+                                               @RequestParam(name = "homestayId",required = false)BigInteger homestayId,
+                                               @RequestParam(name = "userId") BigInteger relateUserId,
+                                               @RequestParam(name = "cityId")BigInteger cityId,
+                                               @RequestParam(name = "images")String images,
+                                               @RequestParam(name = "title")String title,
+                                               @RequestParam(name = "location")String location,
+                                               @RequestParam(name = "longitude")BigDecimal longitude,
+                                               @RequestParam(name = "latitude") BigDecimal latitude,
+                                               @RequestParam(name = "phone")String phone,
+                                               @RequestParam(name = "surroundings",required = false)String surroundings) {
+        if (BaseUtils.isEmpty(loginUser)) {
+            return new Response<>(1002);
+        }
+        //parameters check
+        title = title.trim();
+        if(BaseUtils.isEmpty(title)){
+            return new Response<>(3051);
+        }
+        if (!BaseUtils.isEmpty(relateUserId)){
+            User user = userService.getById(relateUserId);
+            if (BaseUtils.isEmpty(user)){
+                return new Response<>(3052);
+            }
+        }
+        Homestay old = homestayService.getHomestayInfoById(homestayId);
+        if(BaseUtils.isEmpty(old)){
+            return new Response<>(4004);
+        }
 
         try {
-            BigInteger result = homestayService.editHomestay(homestayId, cityId, images, title.trim(), location.trim(), longitude, latitude, phone.trim(), surroundings);
-            return result + "成功 ";
+            BigInteger newHomestayId = homestayService.editHomestay(homestayId,relateUserId, cityId, images, title.trim(), location.trim(), longitude, latitude, phone.trim(), surroundings);
+            Homestay homestay = homestayService.getHomestayInfoById(newHomestayId);
+            HomestayVO homestayVO = new HomestayVO();
+            homestayVO.setHomestayId(newHomestayId);
+            homestayVO.setImages(Collections.singletonList(homestay.getImages()));
+            homestayVO.setTitle(homestay.getTitle());
+            return new Response<>(1001,homestayVO);
 
         }catch(RuntimeException e){
-            return e.getLocalizedMessage();
+            return new Response<>(4004);
         }
     }
     @RequestMapping("/homestay/delete")
-    public String homestayDelete(@RequestParam(name = "homestayId")BigInteger homestayId){
-        int result = homestayService.deleteHomestay(homestayId);
-        return  1 == result ? "成功" : "失败";
+    public Response<Integer> homestayDelete(@VerifiedUser User loginUser,
+                                           @RequestParam(name = "homestayId")BigInteger homestayId){
+        if (BaseUtils.isEmpty(loginUser)) {
+            return new Response<>(1002);
+        }
+        if (BaseUtils.isEmpty(homestayId)) {
+            return new Response<>(4004);
+        }
+        try {
+            homestayService.deleteHomestay(homestayId);
+            return new Response<>(1001);
+        } catch (Exception exception) {
+            return new Response<>(4004);
+        }
     }
 
     @RequestMapping("/homestay/info")
-    public HomestayVO homestayInfo(@RequestParam(name = "homestayId")BigInteger id){
+    public Response<HomestayVO> homestayInfo(@VerifiedUser User loginUser,
+                                             @RequestParam(name = "homestayId")BigInteger id){
+        if (BaseUtils.isEmpty(loginUser)) {
+            return new Response<>(1002);
+        }
         Homestay homestay = homestayService.getHomestayInfoById(id);
         if(homestay == null){
             return null;
@@ -99,10 +169,15 @@ public class HomestayController {
         List<SurroundingsVO> surroundingList = JSON.parseArray(homestay.getSurroundings(), SurroundingsVO.class);
         entry.setSurroundings(surroundingList);
 
-        return entry;
+        return new Response<>(1001,entry);
     }
     @RequestMapping("/homestay/list")
-    public BaseListVO homestayList(@RequestParam(name = "title", required = false)String title, @RequestParam(name = "wp" , required = false) String wp) {
+    public Response<BaseListVO> homestayList(@VerifiedUser User loginUser,
+                                             @RequestParam(name = "title", required = false)String title,
+                                             @RequestParam(name = "wp" , required = false) String wp) {
+        if (BaseUtils.isEmpty(loginUser)) {
+            return new Response<>(1002);
+        }
         int page;
         if (ObjectUtils.isEmpty(wp)) {
             page = 1;
@@ -118,7 +193,9 @@ public class HomestayController {
                 title = wpvo.getTitle();
             }
         }
-        List<Homestay> homestayList = homestayService.getPagingQuery(title, page, pageSize);
+        //每页数据量
+        String pageSize = SpringUtils.getProperty("application.pagesize");
+        List<Homestay> homestayList = homestayService.getPagingQuery(title, page, Integer.parseInt(pageSize));
         List<HomestayListVO> list = new ArrayList<>();
         for (Homestay homestay : homestayList) {
             HomestayListVO entry = new HomestayListVO();
@@ -142,8 +219,11 @@ public class HomestayController {
         wpvo.setTitle(title);
         String jsonString = JSON.toJSONString(wpvo);
         byte[] encodeWp = Base64.getUrlEncoder().encode(jsonString.getBytes(StandardCharsets.UTF_8));
+        int total = homestayService.getPagingQueryTotal(title);
         baseListVO.setList(list);
+        baseListVO.setPageSize(Integer.parseInt(pageSize));
+        baseListVO.setTotal(total);
         baseListVO.setWp(new String(encodeWp,StandardCharsets.UTF_8).trim());
-        return baseListVO;
+        return new Response<>(1001,baseListVO);
     }
 }

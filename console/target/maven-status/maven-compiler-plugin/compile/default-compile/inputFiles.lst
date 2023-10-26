@@ -3,7 +3,9 @@ D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\PageBean.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\city\CityListVO.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\city\CityVO.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\city\CityBaseListVO.java
+D:\JavaSSE\homestay\console\src\main\java\homestay\console\UserAuthorityResolver.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\controller\homestay\HomestayController.java
+D:\JavaSSE\homestay\console\src\main\java\homestay\console\controller\GlobalControllerAdvice.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\homestay\WPVO.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\homestay\HomestayListVO.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\homestay\HomestayVO.java
@@ -11,5 +13,7 @@ D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\homestay\BaseL
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\annotations\VerifiedUser.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\ConsoleApplication.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\controller\city\CityController.java
+D:\JavaSSE\homestay\console\src\main\java\homestay\console\CorsConfig.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\domian\user\UserInfoVO.java
+D:\JavaSSE\homestay\console\src\main\java\homestay\console\WebMvcConfiguration.java
 D:\JavaSSE\homestay\console\src\main\java\homestay\console\controller\user\UserController.java

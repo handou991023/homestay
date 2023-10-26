@@ -86,7 +86,7 @@ public class CityController {
      * @return
      */
     @RequestMapping("/city/update")
-    public String cityUpdate(@RequestParam(name = "id",required = false) BigInteger id,
+    public String cityUpdate(@RequestParam(name = "id") BigInteger id,
                            @RequestParam(name = "name") String name,
                            @RequestParam(name = "image") String image){
         try{

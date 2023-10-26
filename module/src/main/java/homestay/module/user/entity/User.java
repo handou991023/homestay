@@ -43,11 +43,6 @@ public class User {
     private String avatar;
 
     /**
-     * 个人简介
-     */
-    private String personalProfile;
-
-    /**
      * 用户背景封面
      */
     private String coverImage;
@@ -62,34 +57,15 @@ public class User {
      */
     private String birthday;
 
-    /**
-     * 微信
-     */
-    private String wechatOpenId;
-
-    private String wechatUnionId;
-
-    /**
-     * 微信号
-     */
-    private String wechatNo;
-
     private String country;
 
     private String province;
 
     private String city;
-
-    /**
-     * 记录用户加入时间
-     */
-    private Integer registerTime;
-
     /**
      * 注册ip
      */
     private String registerIp;
-
     /**
      * 最后登录时间
      */
@@ -108,11 +84,7 @@ public class User {
     /**
      * json
      */
-    private String extra;
-
-    /**
-     * 创建时间
-     */
+    private Integer registerTime;
     private Integer createTime;
 
     /**

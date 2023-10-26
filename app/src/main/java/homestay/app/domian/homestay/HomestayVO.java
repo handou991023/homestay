@@ -2,7 +2,7 @@ package homestay.app.domian.homestay;
 
 
 
-import homestay.app.domian.homestay.HomestaySurroundingsVO;
+import homestay.app.domian.upload.ImageVO;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -16,7 +16,7 @@ public class HomestayVO {
     private String updateTime;
     private Integer cityId;
     private String cityName;
-    private List<String> images;
+    private List<ImageVO> images;
     private String title;
     private String location;
     private BigDecimal longitude;

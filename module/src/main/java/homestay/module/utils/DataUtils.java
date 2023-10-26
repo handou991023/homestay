@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class DataUtils {
     private static final String[] officialPhone = {
-            "***"
+            "1234567890"
     };
 
     public static boolean isPhoneNumber(String phone) {

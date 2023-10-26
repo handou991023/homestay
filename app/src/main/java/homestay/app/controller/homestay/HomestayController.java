@@ -1,28 +1,36 @@
 package homestay.app.controller.homestay;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import homestay.app.domian.homestay.*;
+import homestay.app.domian.upload.ImageVO;
 import homestay.module.utils.BaseUtils;
 import homestay.module.utils.Response;
-import homestay.module.utils.UploadUtil;
 import homestay.module.city.entity.City;
 import homestay.module.homestay.entity.Homestay;
 import homestay.module.city.service.CityService;
 import homestay.module.homestay.service.HomestayService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 @RestController
 public class HomestayController {
@@ -55,7 +63,34 @@ public class HomestayController {
         entry.setCityName(city.getName());
 
         String[] images = homestay.getImages().split("\\$");
-        entry.setImages(Arrays.asList(images));
+        List<ImageVO> imageVOList= new ArrayList<>();
+        for(String image : images){
+
+            ImageVO imageVO = new ImageVO();
+            int[] wh = new int[2];
+            String[] imageStr = homestay.getImages().split("\\$")[0].split("_");
+            if(imageStr.length >= 2){
+                String[] imageStrEnd = imageStr[imageStr.length -1].split("\\.");
+                String[] imageParam = imageStrEnd[0].split("x");
+                if(imageParam.length == 2 && BaseUtils.isNumeric(imageParam[0]) && BaseUtils.isNumeric(imageParam[1])){
+                    wh[0] = new Integer(imageParam[0]);
+                    wh[1] = new Integer(imageParam[1]);
+                }
+            }
+            double imageAr;
+            if(wh[1] > 0){
+                double ar = new BigDecimal(wh[0]).doubleValue() / wh[1];
+                BigDecimal bg = new BigDecimal(ar);
+                imageAr = bg.setScale(2, RoundingMode.HALF_UP).doubleValue();
+            }else {
+                imageAr = 0;
+            }
+
+            imageVO.setSrc(homestay.getImages().split("\\$")[0]);
+            imageVO.setAr(imageAr);
+            imageVOList.add(imageVO);
+        }
+        entry.setImages(imageVOList);
         entry.setTitle(homestay.getTitle());
         entry.setLocation(homestay.getLocation());
         entry.setLatitude(homestay.getLatitude());
@@ -64,25 +99,6 @@ public class HomestayController {
         List<HomestaySurroundingsVO> surroundingList = JSON.parseArray(homestay.getSurroundings(), HomestaySurroundingsVO.class);
         entry.setSurroundings(surroundingList);
         return new Response<>(1001,entry);
-    }
-    @RequestMapping("/homestay/all")
-    public Response<List<HomestayListVO>> homestayAll() {
-        List<Homestay> homestayList = homestayService.getAllHomestayAllInfo();
-        List<HomestayListVO> list = new ArrayList<>();
-        for (Homestay homestay:homestayList) {
-            HomestayListVO entry = new HomestayListVO();
-
-            City city = cityService.getCityInfoById(homestay.getCityId());
-            entry.setCityName(city.getName());
-            entry.setImage(homestay.getImages().split("\\$")[0]);
-            entry.setHomestayId(homestay.getId());
-
-            entry.setTitle(homestay.getTitle());
-            entry.setLatitude(homestay.getLatitude());
-            entry.setLongitude(homestay.getLongitude());
-            list.add(entry);
-        }
-        return new Response<>(1001,list);
     }
     @RequestMapping("/homestay/list")
     public Response<BaseHomestayListVO> homestayList(@RequestParam(name = "title", required = false)String title,
@@ -121,7 +137,29 @@ public class HomestayController {
                 continue;
             }
             entry.setCityName(city.getName());
-            entry.setImage(homestay.getImages().split("\\$")[0]);
+            ImageVO imageVO = new ImageVO();
+            int[] wh = new int[2];
+            String[] imageStr = homestay.getImages().split("\\$")[0].split("_");
+            if(imageStr.length >= 2){
+                String[] imageStrEnd = imageStr[imageStr.length -1].split("\\.");
+                String[] imageParam = imageStrEnd[0].split("x");
+                if(imageParam.length == 2 && BaseUtils.isNumeric(imageParam[0]) && BaseUtils.isNumeric(imageParam[1])){
+                    wh[0] = new Integer(imageParam[0]);
+                    wh[1] = new Integer(imageParam[1]);
+                }
+            }
+            double imageAr;
+            if(wh[1] > 0){
+                double ar = new BigDecimal(wh[0]).doubleValue() / wh[1];
+                BigDecimal bg = new BigDecimal(ar);
+                imageAr = bg.setScale(2, RoundingMode.HALF_UP).doubleValue();
+            }else {
+                imageAr = 0;
+            }
+            imageVO.setSrc(homestay.getImages().split("\\$")[0]);
+            imageVO.setAr(imageAr);
+
+            entry.setImage(imageVO);
             entry.setHomestayId(homestay.getId());
             entry.setTitle(homestay.getTitle());
             entry.setLatitude(homestay.getLatitude());
@@ -140,46 +178,5 @@ public class HomestayController {
         baseListVO.setList(list);
         baseListVO.setWp(new String(encodeWp,StandardCharsets.UTF_8).trim());
         return new Response<>(1001,baseListVO);
-    }
-
-    @PostMapping("/upload")
-    public String upload(@RequestParam(value = "file") MultipartFile file){
-        //file效验
-        if(file.isEmpty()){
-            return "图片上传失败";
-        }
-        //file重命名
-        String originalFilename = file.getOriginalFilename();//原来的图片名
-        String ext = "." + originalFilename.split("\\.")[1];
-        String uuid = UUID.randomUUID().toString().replace("-","");
-        String fileName = uuid + ext;
-        //上传图片
-        ApplicationHome applicationHome = new ApplicationHome(this.getClass());
-        String pre = applicationHome.getDir().getParentFile().getParentFile().getAbsolutePath() +
-                "\\src\\main\\resources\\static\\images\\";
-        String path = pre + fileName;
-        try {
-            file.transferTo(new File(path));
-            return path;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return  "图片上传失败";
-        }
-    }
-    @RequestMapping("upImg")
-    public String upImg(@RequestParam(value = "file")MultipartFile file)  {
-        try{
-            return UploadUtil.uploadImage(file);
-        }catch (IOException e){
-            return "图片上传失败";
-        }
-    }
-    @RequestMapping("upIm")
-    public String upIm(@RequestParam(value = "file")MultipartFile file)  {
-        try{
-            return UploadUtil.uploadImg(file);
-        }catch (IOException e){
-            return "图片上传失败";
-        }
     }
 }

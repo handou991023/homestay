@@ -1,6 +1,7 @@
 package homestay.module.user.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import homestay.module.user.entity.User;
 import homestay.module.user.mapper.UserMapper;
 import homestay.module.utils.BaseUtils;
@@ -16,15 +17,12 @@ import java.util.List;
 
 import static homestay.module.user.service.UserDefine.GENDER_MALE;
 
+
 @Service
 public class UserService {
     @Resource
     private UserMapper userMapper;
 
-    public BigInteger insert(User user){
-        userMapper.insert(user);
-        return user.getId();
-    }
     public User getById(BigInteger id){
         return userMapper.getById(id);
     }
@@ -43,15 +41,13 @@ public class UserService {
     public User getByPhone(String phone){
         return userMapper.getByPhone(phone,"86");
     }
+    public User getLogin(String phone,String password){
+        return userMapper.getLogin(phone,"86",password);
+    }
     public User extractByPhone(String phone, String countryCode){
         return userMapper.extractByPhone(phone,countryCode);
     }
-    public User extractByEmail(String email){
-        return userMapper.extractByEmail(email);
-    }
-    public User extractUserByWxOpenId(String wechatOpenId){
-        return userMapper.extractUserByWxOpenId(wechatOpenId);
-    }
+
     public int update(User user){
         return userMapper.update(user);
     }
@@ -64,49 +60,48 @@ public class UserService {
     public int delete(BigInteger userId){
         return userMapper.delete(userId, BaseUtils.currentSeconds());
     }
-    public void refreshUserLoginContext(BigInteger id,String ip, int time){
+    public void refreshUserLoginContext(BigInteger id, String ip, int time) {
         User user = new User();
         user.setId(id);
         user.setLastLoginIp(ip);
         user.setLastLoginTime(time);
         user.setUpdateTime(time);
-        try{
+        try {
             update(user);
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
 
         }
+
     }
     @Transactional(rollbackFor = Exception.class)
-    public BigInteger registerUser(String name,String phone,Integer gender, String avatar,String password,
-                                   String country,String province,String city,String ipAddress){
-        if(BaseUtils.isEmpty(avatar)){
-            avatar = gender.equals(GENDER_MALE.getCode()) ? ImageUtils.getDefaultMaleAvatar() :ImageUtils.getDefaultFeMaleAvatar();
-
-        }
-        User newUser = new User();
+    public BigInteger registerUser(String phone,Integer gender, String avatar,String name,String password,
+                                   String country,String province,String city){
         int now = BaseUtils.currentSeconds();
-        newUser.setUsername(name);
-        newUser.setPhone(phone);
-        newUser.setCountryCode("86");
-        newUser.setGender(gender);
-        newUser.setAvatar(avatar);
-        newUser.setPassword(SignUtils.marshal(password));
-        newUser.setCountry(country);
-        newUser.setProvince(province);
-        newUser.setCity(city);
-        newUser.setRegisterTime(now);
-        newUser.setLastLoginTime(now);
-        newUser.setRegisterIp(ipAddress);
-        newUser.setLastLoginIp(ipAddress);
-        newUser.setCreateTime(now);
-        newUser.setIsDeleted(0);
-        insert(newUser);
+        if (BaseUtils.isEmpty(avatar)) {
+            avatar = gender.equals(GENDER_MALE.getCode()) ? ImageUtils.getDefaultMaleAvatar() : ImageUtils.getDefaultFeMaleAvatar();
+        }
+        User user = new User();
+        user.setUsername(name);
+        user.setPhone(phone);
+        user.setCountryCode("86");
+        user.setGender(gender);
+        user.setAvatar(avatar);
+        user.setPassword(SignUtils.marshal(password));
+        user.setCountry(country);
 
-        return  newUser.getId();
+        user.setRegisterTime(now);
+        user.setProvince(province);
+        user.setCity(city);
+        user.setIsBan(0);
+        user.setCreateTime(now);
+        user.setUpdateTime(now);
+        user.setIsDeleted(0);
+        userMapper.insert(user);
+
+        return  user.getId();
     }
 
-    public boolean login(String phone,String countryCode,String password,
-                         boolean noPasswd,boolean remember,int lifeTime){
+    public boolean login(String phone,String countryCode,String password,int lifeTime){
         if (lifeTime < 0){
             return false;
         }
@@ -118,138 +113,15 @@ public class UserService {
         if (BaseUtils.isEmpty(user)){
             return false;
         }
-        return noPasswd || SignUtils.marshal(password).equals(user.getPassword());
+        return SignUtils.marshal(password).equals(user.getPassword());
 
     }
     public boolean login(String phone,String password){
-        return login(phone,"86",password,false,true,SignUtils.getExpirationTime());
-    }
-    public boolean login(String phone,  String password,boolean noPasswd, boolean remember) {
-        return login(phone, "86",password, noPasswd, remember, SignUtils.getExpirationTime());
-    }
 
-    public boolean bindPhoneForEmailUser(User user,String countryCode,String phone){
-        if(DataUtils.isPhoneNumber(phone)){
-            return false;
-        }
-        User upUser = new User();
-        upUser.setId(user.getId());
-        upUser.setPhone(phone);
-        upUser.setCountryCode(countryCode);
-        try {
-            update(user);
-            return true;
-        } catch (Exception exception) {
-            return false;
-        }
+        return login(phone, "86",password, SignUtils.getExpirationTime());
+    }
+    public boolean addToUserService(User user,BigInteger id){
+        return true;
     }
 
-    public boolean changePassword(User user,String password){
-        User upUser = new User();
-        upUser.setId(user.getId());
-        upUser.setPassword(SignUtils.marshal(password));
-        try {
-            update(upUser);
-            return true;
-        } catch (Exception exception) {
-            return false;
-        }
-    }
-
-    public boolean changeAvatar(User user,String avatar){
-        User upUser = new User();
-        upUser.setId(user.getId());
-        upUser.setAvatar(avatar);
-        try {
-            update(upUser);
-            return true;
-        } catch (Exception exception) {
-            return false;
-        }
-    }
-
-    public boolean changeUsername(User user,String username){
-        User upUser = new User();
-        upUser.setId(user.getId());
-        upUser.setUsername(username);
-        try {
-            update(upUser);
-            return true;
-        } catch (Exception exception) {
-            return false;
-        }
-    }
-
-    public boolean changeCoverImage(User user,String image){
-        User upUser = new User();
-        upUser.setId(user.getId());
-        upUser.setCoverImage(image);
-        try {
-            update(upUser);
-            return true;
-        } catch (Exception exception) {
-            return false;
-        }
-    }
-
-    public boolean changePersonalProfile(User user,String personalProfile){
-        User upUser = new User();
-        upUser.setId(user.getId());
-        upUser.setPersonalProfile(personalProfile);
-        try {
-            update(upUser);
-            return true;
-        } catch (Exception exception) {
-            return false;
-        }
-    }
-
-    public boolean changeGender(User user,Integer gender){
-        if(UserDefine.isGender(gender)){
-            throw new RuntimeException("not right gender");
-        }
-        User upUser = new User();
-        upUser.setId(user.getId());
-        upUser.setGender(gender);
-        try {
-            update(upUser);
-            return true;
-        } catch (Exception exception) {
-            return false;
-        }
-    }
-
-    public User getByUsername(String usermapper){
-        return userMapper.getByUsername(usermapper);
-    }
-
-    public List<User> getUsersForConsole(int page, int pageSize, String username, String phone) {
-        int begin = (page - 1) * pageSize;
-        return userMapper.getUsersForConsole(begin, pageSize, "desc", username,phone);
-    }
-
-    public int getUsersTotalForConsole(String username, String phone) {
-        return userMapper.getUsersTotalForConsole(username,phone);
-    }
-
-    public String getUserIdsForSearch(String username) {
-        if (BaseUtils.isEmpty(username)) {
-            return "-1";
-        }
-
-        List<User> users = userMapper.getUsersByUsername(username);
-        String userIds;
-        if (BaseUtils.isEmpty(users)) {
-            userIds = "-1";
-        } else {
-            StringBuffer bUserIds = new StringBuffer();
-            for (User user:users) {
-                bUserIds.append(user.getId()).append(",");
-            }
-            bUserIds.deleteCharAt(bUserIds.length() - 1);
-            userIds = bUserIds.toString();
-        }
-
-        return userIds;
-    }
 }

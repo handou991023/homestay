@@ -1,9 +1,12 @@
 package homestay.module.homestay.service;
 
+import com.alibaba.fastjson.JSON;
 import homestay.module.city.entity.City;
 import homestay.module.city.service.CityService;
 import homestay.module.homestay.entity.Homestay;
 import homestay.module.homestay.mapper.HomestayMapper;
+import homestay.module.homestay.request.HomestayContentDto;
+import homestay.module.utils.BaseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -59,7 +62,7 @@ public class HomestayService {
         return homestayMapper.getPagingQueryTotal(title,cityIds);
     }
 
-    public BigInteger editHomestay(BigInteger id,BigInteger cityId,String images, String title, String location, BigDecimal longitude, BigDecimal latitude, String phone, String surroundings){
+    public BigInteger editHomestay(BigInteger id,BigInteger userId, BigInteger cityId,String images, String title, String location, BigDecimal longitude, BigDecimal latitude, String phone, String surroundings){
         int timestamp = (int)(System.currentTimeMillis()/1000);
 
         City city = cityService.getCityInfoById(cityId);
@@ -85,6 +88,7 @@ public class HomestayService {
             throw new RuntimeException("phone输入错误");
         }
         Homestay homestay = new Homestay();
+        homestay.setUserId(userId);
         homestay.setCityId(cityId);
         homestay.setImages(images);
         homestay.setTitle(title);
@@ -100,7 +104,6 @@ public class HomestayService {
             homestay.setCreateTime(timestamp);
             homestayMapper.insert(homestay);
             id = homestay.getId();
-
         }else {
             Homestay home = homestayMapper.getById(id);
             if(ObjectUtils.isEmpty(home)){

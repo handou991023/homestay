@@ -6,8 +6,8 @@ import java.io.BufferedInputStream;
 import java.net.URL;
 
 public class ImageUtils {
-    private static String defaultMaleAvatar = "/photo/avatar.png";
-    private static String defaultFeMaleAvatar = "/photo/avatar.png";
+    private final static String defaultMaleAvatar = "/photo/avatar.png";
+    private final static String defaultFeMaleAvatar = "/photo/avatar.png";
 
     public static String getDefaultMaleAvatar(){
         return defaultMaleAvatar;

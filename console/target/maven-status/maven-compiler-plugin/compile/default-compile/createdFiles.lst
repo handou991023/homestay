@@ -2,10 +2,14 @@ homestay\console\domian\homestay\HomestayListVO.class
 homestay\console\domian\PageBean.class
 homestay\console\domian\city\CityListVO.class
 homestay\console\domian\homestay\BaseListVO.class
+homestay\console\controller\GlobalControllerAdvice.class
 homestay\console\domian\user\UserInfoVO.class
 homestay\console\domian\city\CityBaseListVO.class
+homestay\console\WebMvcConfiguration.class
+homestay\console\CorsConfig.class
 homestay\console\domian\homestay\WPVO.class
 homestay\console\annotations\VerifiedUser.class
+homestay\console\UserAuthorityResolver.class
 homestay\console\ConsoleApplication.class
 homestay\console\domian\homestay\SurroundingsVO.class
 homestay\console\controller\homestay\HomestayController.class
